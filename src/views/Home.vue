@@ -3,6 +3,12 @@
    
     <h2 v-show="loading">loading ...</h2>
     <div v-show="!loading">
+      <div>
+        <form @submit.prevent="submit">
+          <input type="text" placeholder="searching for ?" v-model="q">
+          <button>Search</button>
+        </form>
+      </div>
       <ul id="nav">
           <li v-for="i in items" :key="i.id"> 
             <a  @click="updateStats(i)" > {{i.title}} </a>
@@ -32,9 +38,16 @@ export default {
   methods:{
     next(){this.page++;this.loadShows()},
     prev(){if(this.page >1){this.page--;this.loadShows()}},
+    submit(ev){
+        this.page =1 ;
+        this.loadShows();
+    },
     loadShows(){
       this.loading = !this.loading;
-      this.axios.get(`/api/shows?page=${this.page}`)
+      var url = `/api/shows?page=${this.page}`;
+      if (this.q && this.q.length > 0) url +=`&q=${this.q}`;
+
+      this.axios.get(url)
       .then(resp => {
         this.items = resp.data;
         this.loading = !this.loading;
