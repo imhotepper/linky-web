@@ -1,7 +1,20 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+   
+    <h2 v-show="loading">loading ...</h2>
+    <div v-show="!loading">
+      <ul id="nav">
+          <li v-for="i in items" :key="i.id"> 
+            <a  :href="i.url" target="_blank"> {{i.title}} </a>
+            <p>since {{i.pubDate}}</p>
+            </li>
+        </ul>
+
+      <h2 v-show="this.items == 0">Empty, just empty!</h2>
+      <button @click="prev" v-show="this.page > 1"><<< Prev </button> &nbsp;
+      <button @click="next" v-show="this.items.length > 0">Next >>> </button>
+    </div>
+      
   </div>
 </template>
 
@@ -13,6 +26,32 @@ export default {
   name: 'home',
   components: {
     HelloWorld
-  }
+  },
+  data(){
+    return{ items : [], page:1, loading:false}
+  },
+  methods:{
+    next(){this.page++;this.loadShows()},
+    prev(){if(this.page >1){this.page--;this.loadShows()}},
+    loadShows(){
+      this.loading = !this.loading;
+      this.axios.get(`/api/shows?page=${this.page}`)
+      .then(resp => {
+        this.items = resp.data;
+        this.loading = !this.loading;
+        })
+      .catch(err => {
+        this.loading = !this.loading;console.log(err);});
+    }
+  },
+  created(){this.loadShows();}
 }
 </script>
+
+<style>
+ul{list-style-type: none}
+a {text-decoration: none;
+  color: #42b983;
+}
+</style>
+
