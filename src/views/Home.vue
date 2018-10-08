@@ -5,16 +5,15 @@
     <div v-show="!loading">
       <ul id="nav">
           <li v-for="i in items" :key="i.id"> 
-            <a  :href="i.url" target="_blank"> {{i.title}} </a>
-            <p>since {{i.pubDate}}</p>
+            <a  @click="updateStats(i)" > {{i.title}} </a>
+            <p>by <a :href="i.website" target="_blank" > {{i.name}} </a> on {{i.pubDate}}</p>
             </li>
         </ul>
-
       <h2 v-show="this.items == 0">Empty, just empty!</h2>
-      <button @click="prev" v-show="this.page > 1"><<< Prev </button> &nbsp;
+      <button @click="prev" v-show="this.page > 1"> <<< Prev </button> &nbsp;
       <button @click="next" v-show="this.items.length > 0">Next >>> </button>
     </div>
-      
+        
   </div>
 </template>
 
@@ -42,6 +41,11 @@ export default {
         })
       .catch(err => {
         this.loading = !this.loading;console.log(err);});
+    },
+    updateStats(show){
+       var win = window.open(show.url, '_blank');
+       win.focus();
+      this.axios.post(`/api/shows/stats/${show.id}`)       
     }
   },
   created(){this.loadShows();}
@@ -50,6 +54,7 @@ export default {
 
 <style>
 ul{list-style-type: none}
+li>a:hover{ cursor:pointer}
 a {text-decoration: none;
   color: #42b983;
 }
